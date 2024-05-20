@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
+import { Button, styled } from "@mui/material";
 
 //Interface de comunicación
 declare global {
@@ -14,8 +15,8 @@ declare global {
 }
 
 function App() {
-    
-    const [message, setMessage] = useState<string|null>(null);
+    const [message, setMessage] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         //Vinculación de todas las funciones que requieran recibir mensajes de la app nativa
@@ -25,18 +26,18 @@ function App() {
             delete window.readMessage;
         };
     }, []);
-    
+
     const readMessage = (str: string) => {
         setMessage(str);
-    }
-
-    const handleRequestCameraPermission = () => {
-        window.ReactNativeWebView.postMessage("requestCameraPermission");
     };
 
-    const handleMessage = () => {
-        window.ReactNativeWebView.postMessage("requesrMessage");
-    }
+    const handleMessage = (msg: string) => {
+        try {
+            window.ReactNativeWebView.postMessage(msg);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const [imageURL, setImageURL] = useState<string | null>(null);
 
@@ -48,17 +49,63 @@ function App() {
         }
     };
 
+    const handleButtonSelectImage = () => {
+        fileInputRef.current?.click();
+    };
 
     return (
         <div className="App">
             <header className="App-header">
-                <input type="file" onChange={handleImageUpload} onClick={handleRequestCameraPermission}/>
-                {imageURL && <img src={imageURL} alt="Imagen seleccionada" width={200} height={300}/>}
-                <button onClick={handleMessage}>Ver Mensaje desde la APP Nativa</button>
+                <input
+                    type="file"
+                    className="Input-file"
+                    onChange={handleImageUpload}
+                    ref={fileInputRef}
+                />
+                <ButtonSelectImage
+                    variant="contained"
+                    onClick={() => {
+                        handleMessage("requestCameraPermission");
+                        handleButtonSelectImage();
+                    }}
+                    className="Button-select-image"
+                >
+                    Seleccionar Imagen
+                </ButtonSelectImage>
+                {imageURL && (
+                    <img
+                        src={imageURL}
+                        alt="Imagen seleccionada"
+                        width={200}
+                        height={300}
+                    />
+                )}
+                <ButtonViewMessage
+                    variant="contained"
+                    onClick={() => handleMessage("requesrMessage")}
+                >
+                    Ver Mensaje desde la APP Nativa
+                </ButtonViewMessage>
+                <ButtonReadQR
+                    variant="contained"
+                    onClick={() => handleMessage("readQR")}
+                >
+                    Leer QR
+                </ButtonReadQR>
                 {message && <p>{message}</p>}
             </header>
         </div>
     );
 }
+
+const ButtonSelectImage = styled(Button)(({ theme }) => ({
+    marginBottom: 30,
+}));
+const ButtonViewMessage = styled(Button)(({ theme }) => ({
+    marginBottom: 30,
+}));
+const ButtonReadQR = styled(Button)(({ theme }) => ({
+    marginBottom: 30,
+}));
 
 export default App;

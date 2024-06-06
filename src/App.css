@@ -14,14 +14,15 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #eceef1;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: black;
+  max-width: 100vw;
 }
 
 .App-link {
@@ -30,6 +31,11 @@
 
 .Input-file {
   display: none;
+}
+
+.Divider {
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 @keyframes App-logo-spin {
